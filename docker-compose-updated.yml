@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: projeto-clientes-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: clientes_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - projeto-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d clientes_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Python FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: projeto-clientes-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/clientes_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - projeto-network
+
+# Volumes para persistência de dados
+volumes:
+  postgres_data:
+    driver: local
+
+# Rede para comunicação entre containers
+networks:
+  projeto-network:
+    driver: bridge
