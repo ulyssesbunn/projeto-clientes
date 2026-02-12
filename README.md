@@ -167,3 +167,5 @@ Desenvolvido como projeto de aprendizado em DevOps e desenvolvimento Full Stack.
 ## 📄 Licença
 
 Projeto de uso pessoal e educacional.
+
+## 🚀 Projeto Completo com CI/CD
