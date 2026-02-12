@@ -58,7 +58,7 @@ deploy-production:
   stage: deploy
   script:
     - echo "🚀 Deploying to production..."
-    - cd ~/projeto-clientes
+    - cd /home/ubunn/projeto-clientes
     - docker-compose down
     - docker-compose up --build -d
     - echo "✅ Deploy concluído!"
