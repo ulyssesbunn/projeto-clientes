@@ -39,15 +39,15 @@ pipeline {
         }
         
         stage('Deploy') {
-            steps {
-                echo 'Deploy...'
-                sh '''
-                    cd ${PROJECT_DIR}
-                    docker-compose down || true
-                    docker-compose up -d
-                '''
-            }
-        }
+    steps {
+        echo 'Deploy...'
+        sh """
+            cd ${PROJECT_DIR}
+            BUILD_NUMBER=${BUILD_NUMBER} docker-compose down || true
+            BUILD_NUMBER=${BUILD_NUMBER} docker-compose up -d
+        """
+    }
+}
     }
     
     post {
