@@ -18,8 +18,7 @@ pipeline {
                 echo 'Building Backend...'
                 dir('backend') {
                     sh 'docker build -t projeto-clientes-backend:${BUILD_NUMBER} .'
-                    sh 'docker tag projeto-clientes-backend:${BUILD_NUMBER} projeto-clientes-backend:latest'
-                }
+                                   }
             }
         }
         
@@ -28,8 +27,7 @@ pipeline {
                 echo 'Building Frontend...'
                 dir('frontend') {
                     sh 'docker build -t projeto-clientes-frontend:${BUILD_NUMBER} .'
-                    sh 'docker tag projeto-clientes-frontend:${BUILD_NUMBER} projeto-clientes-frontend:latest'
-                }
+                                   }
             }
         }
         
