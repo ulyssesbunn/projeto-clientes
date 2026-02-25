@@ -43,8 +43,8 @@ pipeline {
                 echo 'Deploy local (dev)...'
                 sh """
                     cd ${PROJECT_DIR}
-                    BUILD_NUMBER=${BUILD_NUMBER} docker compose down || true
-                    BUILD_NUMBER=${BUILD_NUMBER} docker compose up -d
+                    BUILD_NUMBER=${BUILD_NUMBER} docker-compose down || true
+                    BUILD_NUMBER=${BUILD_NUMBER} docker-compose up -d
                 """
             }
         }
