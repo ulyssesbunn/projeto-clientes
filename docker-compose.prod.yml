@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: projeto-clientes-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: clientes_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - projeto-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d clientes_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: projeto-clientes-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/clientes_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - projeto-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: projeto-clientes-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - projeto-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  projeto-network:
+    driver: bridge

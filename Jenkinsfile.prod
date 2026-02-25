@@ -48,7 +48,7 @@ pipeline {
                         chmod 400 \$SSH_KEY
 
                         scp -i \$SSH_KEY -o StrictHostKeyChecking=no -r \
-                            backend frontend database docker-compose.prod.yml \
+                            backend/ frontend/ \
                             ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
 
                         ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
