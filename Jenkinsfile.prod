@@ -43,17 +43,11 @@ pipeline {
         stage('Deploy PROD (EC2)') {
             steps {
                 echo 'Deploy na EC2 (prod)...'
-                sshagent(credentials: ['ec2-ssh-key']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
-                        rsync -az --exclude='.git' --exclude='__pycache__' --exclude='node_modules' \
-                            -e 'ssh -o StrictHostKeyChecking=no' \
-                            ./ ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
-
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
-                            cd ${EC2_DIR}
-                            docker compose -f docker-compose.prod.yml up -d --build
-                            docker image prune -f
-                        '
+                        chmod 400 \$SSH_KEY
+                        ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
+                            'cd ${EC2_DIR} && docker compose -f docker-compose.prod.yml up -d --build && docker image prune -f'
                     """
                 }
             }
