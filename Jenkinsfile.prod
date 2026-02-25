@@ -46,6 +46,11 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
                         chmod 400 \$SSH_KEY
+
+                        scp -i \$SSH_KEY -o StrictHostKeyChecking=no -r \
+                            backend frontend database docker-compose.prod.yml \
+                            ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
+
                         ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
                             'cd ${EC2_DIR} && docker compose -f docker-compose.prod.yml up -d --build && docker image prune -f'
                     """
