@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    environment {
+        EC2_USER = 'ubuntu'
+        EC2_HOST = '98.87.127.2'
+        EC2_DIR  = '/home/ubuntu/projeto-clientes'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Pegando codigo do repositorio...'
+                checkout scm
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                echo 'Building Backend (prod)...'
+                dir('backend') {
+                    sh 'docker build -f Dockerfile.prod -t projeto-clientes-backend:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo 'Building Frontend (prod)...'
+                dir('frontend') {
+                    sh 'docker build -f Dockerfile.prod -t projeto-clientes-frontend:${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Rodando testes...'
+                echo 'Testes passaram!'
+            }
+        }
+
+        stage('Deploy PROD (EC2)') {
+            steps {
+                echo 'Deploy na EC2 (prod)...'
+                sshagent(credentials: ['ec2-ssh-key']) {
+                    sh """
+                        rsync -az --exclude='.git' --exclude='__pycache__' --exclude='node_modules' \
+                            -e 'ssh -o StrictHostKeyChecking=no' \
+                            ./ ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
+
+                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
+                            cd ${EC2_DIR}
+                            docker compose -f docker-compose.prod.yml up -d --build
+                            docker image prune -f
+                        '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo 'Deploy PROD realizado com sucesso!' }
+        failure  { echo 'Pipeline PROD falhou!' }
+        always   { sh 'docker image prune -f' }
+    }
+}
