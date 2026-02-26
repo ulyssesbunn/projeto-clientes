@@ -1,12 +1,10 @@
 pipeline {
     agent any
-
     environment {
         EC2_USER = 'ubuntu'
         EC2_HOST = '98.87.127.2'
         EC2_DIR  = '/home/ubuntu/projeto-clientes'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -14,7 +12,6 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('Build Backend') {
             steps {
                 echo 'Building Backend (prod)...'
@@ -23,7 +20,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Frontend') {
             steps {
                 echo 'Building Frontend (prod)...'
@@ -32,33 +28,28 @@ pipeline {
                 }
             }
         }
-
         stage('Test') {
             steps {
                 echo 'Rodando testes...'
                 echo 'Testes passaram!'
             }
         }
-
         stage('Deploy PROD (EC2)') {
             steps {
                 echo 'Deploy na EC2 (prod)...'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
                         chmod 400 \$SSH_KEY
-
                         scp -i \$SSH_KEY -o StrictHostKeyChecking=no -r \
-                            backend/ frontend/ \
+                            backend/ frontend/ database/ docker-compose.prod.yml \
                             ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
-
                         ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
-                            'cd ${EC2_DIR} && docker compose -f docker-compose.prod.yml up -d --build && docker image prune -f'
+                            'cd ${EC2_DIR} && BUILD_NUMBER=${BUILD_NUMBER} docker compose -f docker-compose.prod.yml up -d --build && docker tag projeto-clientes-backend:latest projeto-clientes-backend:${BUILD_NUMBER} && docker tag projeto-clientes-frontend:latest projeto-clientes-frontend:${BUILD_NUMBER} && docker image prune -f'
                     """
                 }
             }
         }
     }
-
     post {
         success { echo 'Deploy PROD realizado com sucesso!' }
         failure  { echo 'Pipeline PROD falhou!' }
