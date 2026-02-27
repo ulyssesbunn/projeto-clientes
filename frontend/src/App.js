@@ -173,8 +173,7 @@ function App() {
       <section className="hero">
         <div className="hero-label">Full Stack · DevOps · AWS</div>
         <h1 className="hero-title">
-          Sistema de Cadastro<br />
-          <span className="hero-accent">de Clientes</span>
+          Sistema de Cadastro <span className="hero-accent">de Clientes</span>
         </h1>
         <p className="hero-desc">
           Aplicação containerizada rodando em produção na AWS EC2 com pipeline
