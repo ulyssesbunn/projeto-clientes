@@ -33,8 +33,8 @@ pipeline {
                 sh 'sleep 5'
                 echo 'Rodando testes reais...'
                 dir('backend') {
-                    sh 'pip install -r requirements.txt --break-system-packages --quiet'
-                    sh 'pytest tests/ -v --tb=short'
+                    sh 'python3 -m pip install -r requirements.txt --break-system-packages --quiet'
+                    sh 'python3 -m pytest tests/ -v --tb=short'
                 }
             }
         }
