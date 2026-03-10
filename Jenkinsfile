@@ -29,10 +29,10 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Garantindo PostgreSQL rodando...'
-                sh "cd ${PROJECT_DIR} && docker-compose up -d postgres"
-                sh 'sleep 5'
+                sh "cd ${PROJECT_DIR} && docker-compose up -d --wait postgres"
                 echo 'Rodando testes reais...'
                 dir('backend') {
+                    sh 'apt-get install -y python3-pip --quiet 2>/dev/null || python3 -m ensurepip --upgrade'
                     sh 'python3 -m pip install -r requirements.txt --break-system-packages --quiet'
                     sh 'python3 -m pytest tests/ -v --tb=short'
                 }
