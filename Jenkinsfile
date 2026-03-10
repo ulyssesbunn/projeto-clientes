@@ -1,10 +1,8 @@
 pipeline {
     agent any
-
     environment {
         PROJECT_DIR = '/home/ubunn/projeto-clientes'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -12,7 +10,6 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('Build Backend') {
             steps {
                 echo 'Building Backend (dev)...'
@@ -21,7 +18,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Frontend') {
             steps {
                 echo 'Building Frontend (dev)...'
@@ -30,14 +26,18 @@ pipeline {
                 }
             }
         }
-
         stage('Test') {
             steps {
-                echo 'Rodando testes...'
-                echo 'Testes passaram!'
+                echo 'Garantindo PostgreSQL rodando...'
+                sh "cd ${PROJECT_DIR} && docker-compose up -d postgres"
+                sh 'sleep 5'
+                echo 'Rodando testes reais...'
+                dir('backend') {
+                    sh 'pip install -r requirements.txt --break-system-packages --quiet'
+                    sh 'pytest tests/ -v --tb=short'
+                }
             }
         }
-
         stage('Deploy DEV') {
             steps {
                 echo 'Deploy local (dev)...'
@@ -49,7 +49,6 @@ pipeline {
             }
         }
     }
-
     post {
         success { echo 'Deploy DEV realizado com sucesso!' }
         failure  { echo 'Pipeline DEV falhou!' }
