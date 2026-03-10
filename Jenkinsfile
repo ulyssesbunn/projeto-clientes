@@ -31,11 +31,13 @@ pipeline {
                 echo 'Garantindo PostgreSQL rodando...'
                 sh "cd ${PROJECT_DIR} && docker-compose up -d --wait postgres"
                 echo 'Rodando testes reais...'
-                dir('backend') {
-                    sh 'apt-get install -y python3-pip --quiet 2>/dev/null || python3 -m ensurepip --upgrade'
-                    sh 'python3 -m pip install -r requirements.txt --break-system-packages --quiet'
-                    sh 'python3 -m pytest tests/ -v --tb=short'
-                }
+                sh """
+                    docker run --rm \
+                        --network projeto-clientes_default \
+                        -e DATABASE_URL=postgresql://admin:admin123@postgres:5432/clientes_db \
+                        projeto-clientes-backend:${BUILD_NUMBER} \
+                        python -m pytest tests/ -v --tb=short
+                """
             }
         }
         stage('Deploy DEV') {
