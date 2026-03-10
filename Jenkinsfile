@@ -33,7 +33,7 @@ pipeline {
                 echo 'Rodando testes reais...'
                 sh """
                     docker run --rm \
-                        --network projeto-clientes_default \
+                        --network projeto-clientes_projeto-network \
                         -e DATABASE_URL=postgresql://admin:admin123@postgres:5432/clientes_db \
                         projeto-clientes-backend:${BUILD_NUMBER} \
                         python -m pytest tests/ -v --tb=short
