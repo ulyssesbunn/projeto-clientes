@@ -10,6 +10,22 @@ pipeline {
                 checkout scm
             }
         }
+        stage('OWASP: Dependency Check') {
+            steps {
+                echo 'Rodando OWASP Dependency Check...'
+                dir('frontend') {
+                    dependencyCheck additionalArguments: '''
+                        --scan ./
+                        --disableYarnAudit
+                        --disableNodeAudit
+                        --format HTML
+                        --format XML
+                    ''',
+                    odcInstallation: 'OWASP'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
         stage('Build Backend') {
             steps {
                 echo 'Building Backend (dev)...'
