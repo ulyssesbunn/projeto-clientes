@@ -13,16 +13,19 @@ pipeline {
         stage('OWASP: Dependency Check') {
             steps {
                 echo 'Rodando OWASP Dependency Check...'
-                dir('frontend') {
-                    dependencyCheck additionalArguments: '''
-                        --scan ./
-                        --disableYarnAudit
-                        --disableNodeAudit
-                        --format HTML
-                        --format XML
-                    ''',
-                    odcInstallation: 'OWASP'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_KEY')]) {
+                    dir('frontend') {
+                        dependencyCheck additionalArguments: """
+                            --scan ./
+                            --disableYarnAudit
+                            --disableNodeAudit
+                            --format HTML
+                            --format XML
+                            --nvdApiKey ${NVD_KEY}
+                        """,
+                        odcInstallation: 'OWASP'
+                        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                    }
                 }
             }
         }
