@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<analysis xmlns="https://jeremylong.github.io/DependencyCheck/dependency-check.4.1.xsd">
+    <scanInfo>
+        <engineVersion>12.2.0</engineVersion>
+        <dataSource>
+            <name>NVD API Last Checked</name>
+            <timestamp>2026-03-16T15:37:15Z</timestamp>
+        </dataSource>
+        <dataSource>
+            <name>NVD API Last Modified</name>
+            <timestamp>2026-03-16T15:16:23Z</timestamp>
+        </dataSource>
+    </scanInfo>
+    <projectInfo>
+        <name>projeto-clientes #56</name>
+        <reportDate>2026-03-16T15:37:21.085913469Z</reportDate>
+        <credits>This product uses the NVD API but is not endorsed or certified by the NVD. This report contains data retrieved from the National Vulnerability Database: https://nvd.nist.gov, Github Advisory Database (via NPM Audit API): https://github.com/advisories/, and the RetireJS community.</credits>
+    </projectInfo>
+    <dependencies>
+        <dependency isVirtual="false">
+            <fileName>App.js</fileName>
+            <filePath>/var/jenkins_home/workspace/projeto-clientes/frontend/src/App.js</filePath>
+            <md5>4af670a4e8bd2d9a952b67548a70cae5</md5>
+            <sha1>3f91f48832aab04b4cd41dcac28a6d68866f5658</sha1>
+            <sha256>0264d3b14d9fedfb025d3705638ac77cd9eb1ec9956e79a554c47c56dc48c038</sha256>
+            <evidenceCollected>
+            </evidenceCollected>
+        </dependency>
+        <dependency isVirtual="false">
+            <fileName>api.js</fileName>
+            <filePath>/var/jenkins_home/workspace/projeto-clientes/frontend/src/services/api.js</filePath>
+            <md5>ec978f261e606116bd15a752e0d3ac8b</md5>
+            <sha1>2c5e7d3fdb5082d23e90f36a8ce3ac96a033ea66</sha1>
+            <sha256>a41b8629d6c2f8255f9f7b3f0efec4e91dd8f490ac0e8a87f8e628aabcb3b77c</sha256>
+            <evidenceCollected>
+            </evidenceCollected>
+        </dependency>
+        <dependency isVirtual="false">
+            <fileName>index.js</fileName>
+            <filePath>/var/jenkins_home/workspace/projeto-clientes/frontend/src/index.js</filePath>
+            <md5>9fc5841375336fc175b49f8767a11383</md5>
+            <sha1>c1cf8fbdbff98551f03c6ed15f9bd0bbd2d0ed4c</sha1>
+            <sha256>eadee16a69ff4b3d0694a1f5a54268c39c26627e3e8a70240e19254281f798f2</sha256>
+            <evidenceCollected>
+            </evidenceCollected>
+        </dependency>
+        <dependency isVirtual="false">
+            <fileName>package.json</fileName>
+            <filePath>/var/jenkins_home/workspace/projeto-clientes/frontend/package.json</filePath>
+            <md5>56c4ca6675912e2f5158e10d587321ad</md5>
+            <sha1>2a1f868647ec1c74adb4392283f13c6286f2e678</sha1>
+            <sha256>0a95e510ef3683683abdf9edbe1993a05d597e57deb6d27caea6fca67c1988f5</sha256>
+            <evidenceCollected>
+            </evidenceCollected>
+        </dependency>
+    </dependencies>
+</analysis>
