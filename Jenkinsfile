@@ -65,6 +65,30 @@ pipeline {
                 }
             }
         }
+        stage('Trivy: Image Scan') {
+            steps {
+                echo 'Rodando Trivy image scan...'
+                sh """
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v \$HOME/.cache/trivy:/root/.cache/trivy \
+                        aquasec/trivy:latest image \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --format table \
+                        projeto-clientes-backend:\${BUILD_NUMBER}
+
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v \$HOME/.cache/trivy:/root/.cache/trivy \
+                        aquasec/trivy:latest image \
+                        --exit-code 0 \
+                        --severity HIGH,CRITICAL \
+                        --format table \
+                        projeto-clientes-frontend:\${BUILD_NUMBER}
+                """
+            }
+        }
         stage('Deploy DEV') {
             steps {
                 echo 'Deploy local (dev)...'
