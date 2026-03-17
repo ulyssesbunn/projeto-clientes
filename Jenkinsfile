@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         PROJECT_DIR = '/home/ubunn/projeto-clientes'
+        SONAR_HOME = tool 'Sonar'
     }
     stages {
         stage('Checkout') {
@@ -10,19 +11,38 @@ pipeline {
                 checkout scm
             }
         }
+        stage('SonarQube: Code Analysis') {
+            steps {
+                withSonarQubeEnv('Sonar') {
+                    sh """
+                        ${SONAR_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=projeto-clientes \
+                        -Dsonar.projectName=projeto-clientes \
+                        -Dsonar.sources=frontend/src,backend/app \
+                        -Dsonar.exclusions=**/node_modules/**,**/__pycache__/**
+                    """
+                }
+            }
+        }
+        stage('SonarQube: Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
         stage('OWASP: Dependency Check') {
             steps {
                 echo 'Rodando OWASP Dependency Check...'
                 withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_KEY')]) {
                     dir('frontend') {
-                        dependencyCheck additionalArguments: """
+                        dependencyCheck additionalArguments: '''
                             --scan ./
                             --disableYarnAudit
                             --disableNodeAudit
                             --format HTML
                             --format XML
-                            --nvdApiKey ${NVD_KEY}
-                        """,
+                        ''' + " --nvdApiKey ${NVD_KEY}",
                         odcInstallation: 'OWASP'
                         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
                     }
