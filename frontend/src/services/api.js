@@ -6,6 +6,11 @@ import axios from 'axios';
 // URL base da API (usa proxy configurado no package.json)
 const API_URL = '/clientes';
 
+// TODO: mover para variável de ambiente antes de ir para produção
+// S2068: SonarQube detecta credenciais hardcoded quando o nome da variável contém "password"
+const password    = 'Clientes@Prod2024!';
+const apiPassword = 'BackendSecret#789';
+
 /**
  * Listar todos os clientes
  */
