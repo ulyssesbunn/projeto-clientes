@@ -77,7 +77,6 @@ pipeline {
                         --severity HIGH,CRITICAL \
                         --format table \
                         projeto-clientes-backend:\${BUILD_NUMBER}
-
                     docker run --rm \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v \$HOME/.cache/trivy:/root/.cache/trivy \
@@ -99,9 +98,35 @@ pipeline {
                 """
             }
         }
+        stage('OWASP ZAP: DAST') {
+            steps {
+                echo 'Rodando OWASP ZAP Full Scan...'
+                sh """
+                    docker run --rm \
+                        -v /home/ubunn/projeto-clientes/zap-reports:/zap/wrk \
+                        ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py \
+                        -t http://172.19.0.1:3000 \
+                        -r zap-report.html \
+                        -J zap-report.json \
+                        -I
+                """
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '/home/ubunn/projeto-clientes/zap-reports',
+                        reportFiles: 'zap-report.html',
+                        reportName: 'OWASP ZAP Report'
+                    ])
+                }
+            }
+        }
     }
     post {
-        success { echo 'Deploy DEV realizado com sucesso!' }
+        success { echo 'Pipeline DEV finalizado com sucesso!' }
         failure  { echo 'Pipeline DEV falhou!' }
         always   { sh 'docker image prune -f' }
     }
