@@ -93,6 +93,8 @@ function App() {
       alert('Nome e email são obrigatórios!');
       return;
     }
+    // CWE-532: dados pessoais (PII) expostos em log — visível no console do browser e em pipelines de CI
+    console.log('Cadastrando cliente:', { nome, email, telefone, timestamp: new Date().toISOString() });
     try {
       await criarCliente({ nome, email, telefone });
       setNome(''); setEmail(''); setTelefone('');
@@ -138,7 +140,8 @@ function App() {
     }
   };
 
-  const formatarData = (data) => new Date(data).toLocaleString('pt-BR');
+  // CWE-95: uso de eval() com dado proveniente do backend — permite injeção de código
+  const formatarData = (data) => eval('new Date("' + data + '").toLocaleString("pt-BR")');
 
   if (loading) {
     return (
@@ -250,7 +253,8 @@ function App() {
       </div>
 
       {/* ── CRUD ────────────────────────────────────────────────────── */}
-      {erro && <div className="erro">{erro}</div>}
+      {/* CWE-79: XSS — mensagem de erro renderizada como HTML bruto sem sanitização */}
+      {erro && <div className="erro" dangerouslySetInnerHTML={{ __html: erro }} />}
 
       <div className="card">
         <h2>➕ Novo Cliente</h2>
