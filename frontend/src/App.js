@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { listarClientes, criarCliente, atualizarCliente, deletarCliente } from './services/api';
+import KqlSimulator from './KqlSimulator';
 
 // ── Componentes da vitrine ────────────────────────────────────────────────────
 
@@ -38,110 +39,6 @@ function TechTag({ name, color }) {
     <span className="tech-tag" style={{ '--c': color }}>
       {name}
     </span>
-  );
-}
-
-// ── KQL ──────────────────────────────────────────────────────────────────────
-
-const KQL_QUERIES = [
-  {
-    label: 'Requisições HTTP',
-    icon: '📡',
-    query: `requests
-| where timestamp > ago(1h)
-| summarize
-    total     = count(),
-    falhas    = countif(success == false),
-    p95_ms    = percentile(duration, 95)
-  by bin(timestamp, 5m)
-| order by timestamp desc`,
-  },
-  {
-    label: 'Exceções',
-    icon: '⚠️',
-    query: `exceptions
-| where timestamp > ago(24h)
-| summarize ocorrencias = count() by type, outerMessage
-| order by ocorrencias desc
-| take 10`,
-  },
-  {
-    label: 'Latência p99',
-    icon: '⏱️',
-    query: `requests
-| where timestamp > ago(6h)
-| summarize
-    p50 = percentile(duration, 50),
-    p95 = percentile(duration, 95),
-    p99 = percentile(duration, 99)
-  by name
-| order by p99 desc`,
-  },
-  {
-    label: 'Clientes criados',
-    icon: '📊',
-    query: `customEvents
-| where name == "cliente_criado"
-| summarize novos = count() by bin(timestamp, 1h)
-| render timechart`,
-  },
-];
-
-function KqlToken({ text }) {
-  const keywords = ['where', 'summarize', 'order', 'by', 'take', 'render', 'bin', 'count', 'countif', 'percentile'];
-  const functions = ['ago', 'count', 'countif', 'percentile', 'bin', 'render'];
-  const pipes = text === '|';
-  const word = text.replace(/[^a-zA-Z0-9_]/g, '');
-  if (pipes) return <span className="kql-pipe">{text}</span>;
-  if (keywords.includes(word)) return <span className="kql-kw">{text}</span>;
-  if (functions.includes(word)) return <span className="kql-fn">{text}</span>;
-  if (text.startsWith('"') || text.startsWith("'")) return <span className="kql-str">{text}</span>;
-  if (/^\d/.test(text)) return <span className="kql-num">{text}</span>;
-  if (text.startsWith('//')) return <span className="kql-comment">{text}</span>;
-  return <span>{text}</span>;
-}
-
-function KqlBlock({ query }) {
-  return (
-    <pre className="kql-pre">
-      {query.split('\n').map((line, li) => (
-        <div key={li} className="kql-line">
-          <span className="kql-ln">{String(li + 1).padStart(2, ' ')}</span>
-          {line.split(/(\s+|==|!=|>|<|=|\||\(|\)|,)/).map((tok, ti) => (
-            <KqlToken key={ti} text={tok} />
-          ))}
-        </div>
-      ))}
-    </pre>
-  );
-}
-
-function KqlSection() {
-  const [active, setActive] = React.useState(0);
-  return (
-    <section className="showcase-section">
-      <h2 className="section-heading"><span>//</span> monitoramento · kql</h2>
-      <div className="kql-card">
-        <div className="kql-tabs">
-          {KQL_QUERIES.map((q, i) => (
-            <button
-              key={i}
-              className={`kql-tab${active === i ? ' active' : ''}`}
-              onClick={() => setActive(i)}
-            >
-              <span>{q.icon}</span> {q.label}
-            </button>
-          ))}
-        </div>
-        <div className="kql-body">
-          <div className="kql-toolbar">
-            <span className="kql-badge">KQL · Azure Monitor</span>
-            <span className="kql-file">Log Analytics Workspace</span>
-          </div>
-          <KqlBlock query={KQL_QUERIES[active].query} />
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -361,7 +258,10 @@ function App() {
       </section>
 
       {/* ── KQL ─────────────────────────────────────────────────────── */}
-      <KqlSection />
+      <section className="showcase-section">
+        <h2 className="section-heading"><span>//</span> monitoramento · kql</h2>
+        <KqlSimulator />
+      </section>
 
       {/* ── DIVISOR ─────────────────────────────────────────────────── */}
       <div className="section-divider">
