@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { listarClientes, criarCliente, atualizarCliente, deletarCliente } from './services/api';
+import KqlSimulator from './KqlSimulator';
 // ── Componentes da vitrine ────────────────────────────────────────────────────
 
 function StatusDot({ ok }) {
@@ -47,6 +48,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [backendOk, setBackendOk] = useState(null);
+  const [kqlOpen, setKqlOpen] = useState(false);
 
   // Formulário
   const [nome, setNome] = useState('');
@@ -164,6 +166,7 @@ function App() {
 
   return (
     <div className="App">
+      {kqlOpen && <KqlSimulator onClose={() => setKqlOpen(false)} />}
 
       {/* ── HEADER ──────────────────────────────────────────────────── */}
       <header className="site-header">
@@ -174,6 +177,7 @@ function App() {
             <span className="brand-bracket">]</span>
           </div>
           <div className="header-status">
+            <button className="btn-kql" onClick={() => setKqlOpen(true)}>Kusto Query</button>
             <StatusDot ok={backendOk === true} />
             <span>{backendOk === true ? 'PROD · ONLINE' : backendOk === false ? 'OFFLINE' : 'verificando...'}</span>
           </div>
@@ -182,14 +186,14 @@ function App() {
 
       {/* ── HERO ────────────────────────────────────────────────────── */}
       <section className="hero">
-        <div className="hero-label">Full Stack · DevOps · AWS</div>
+        <div className="hero-label">Full Stack · DevOps · AWS · Azure</div>
         <h1 className="hero-title">
           Sistema de Cadastro <span className="hero-accent">de Clientes</span>
         </h1>
         <p className="hero-desc">
-          Aplicação containerizada rodando em produção na AWS EC2 com pipeline
-          CI/CD automatizado via Jenkins, monitoramento com Prometheus + Grafana
-          e rollback por BUILD_NUMBER.
+          Aplicação containerizada rodando em produção na AWS EC2 e Azure VM com pipeline
+          CI/CD automatizado via Jenkins, análise de código com SonarQube, segurança com
+          OWASP ZAP + Trivy, monitoramento com Prometheus + Grafana e rollback por BUILD_NUMBER.
         </p>
         <div className="tech-tags">
           <TechTag name="React 18"    color="#61dafb" />
@@ -198,8 +202,14 @@ function App() {
           <TechTag name="Docker"      color="#2496ed" />
           <TechTag name="Jenkins"     color="#d33833" />
           <TechTag name="AWS EC2"     color="#ff9900" />
+          <TechTag name="Azure VM"    color="#0078d4" />
           <TechTag name="Nginx"       color="#43a047" />
           <TechTag name="Prometheus"  color="#e6522c" />
+          <TechTag name="Grafana"     color="#f46800" />
+          <TechTag name="SonarQube"   color="#4e9bcd" />
+          <TechTag name="OWASP ZAP"   color="#00549e" />
+          <TechTag name="Trivy"       color="#1904da" />
+          <TechTag name="Dep Check"   color="#6db33f" />
         </div>
       </section>
 
@@ -213,6 +223,7 @@ function App() {
           <InfraCard icon="🐍"  title="FastAPI"        sub="backend · porta 8000"        ok={backendOk === true} />
           <InfraCard icon="🐘"  title="PostgreSQL 15"  sub={`${clientes.length} clientes no banco`} ok />
           <InfraCard icon="🔁"  title="Jenkins CI/CD"  sub="build → SCP → SSH deploy"   ok />
+          <InfraCard icon="☁️"  title="Azure VM"        sub="máquina virtual · Microsoft"  ok />
         </div>
       </section>
 
@@ -249,7 +260,7 @@ function App() {
       <section className="showcase-section">
         <h2 className="section-heading"><span>//</span> pipeline ci/cd</h2>
         <div className="pipeline">
-          {['Checkout', 'Build Images', 'Testes', 'SCP → EC2', 'SSH Deploy', 'Tag BUILD_NUMBER'].map((label, i) => (
+          {['Checkout', 'SonarQube Analysis', 'Quality Gate', 'OWASP Dep Check', 'Build Backend', 'Build Frontend', 'Trivy Scan', 'Deploy DEV', 'OWASP ZAP DAST'].map((label, i) => (
             <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
           ))}
         </div>
@@ -338,7 +349,7 @@ function App() {
       </div>
 
       <footer className="footer">
-        <p>projeto-clientes · AWS EC2 · Docker + FastAPI + React + Jenkins</p>
+        <p>projeto-clientes · AWS EC2 · Azure VM · Docker + FastAPI + React + Jenkins</p>
       </footer>
 
     </div>
