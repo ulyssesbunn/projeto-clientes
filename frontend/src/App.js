@@ -191,9 +191,10 @@ function App() {
           Sistema de Cadastro <span className="hero-accent">de Clientes</span>
         </h1>
         <p className="hero-desc">
-          Aplicação containerizada rodando em produção na AWS EC2 e Azure VM com pipeline
-          CI/CD automatizado via Jenkins, análise de código com SonarQube, segurança com
-          OWASP ZAP + Trivy, monitoramento com Prometheus + Grafana e rollback por BUILD_NUMBER.
+          Projeto full stack containerizado com pipeline DevSecOps completo — SAST via SonarQube,
+          análise de dependências com OWASP Dependency Check, varredura de imagens com Trivy e DAST
+          com OWASP ZAP, entregue em produção com CI/CD automatizado via Jenkins em infraestrutura
+          multi-cloud (AWS EC2 + Azure VM).
         </p>
         <div className="tech-tags">
           <TechTag name="React 18"    color="#61dafb" />
