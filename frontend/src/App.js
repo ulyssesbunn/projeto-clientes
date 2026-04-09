@@ -4,8 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { listarClientes, criarCliente, atualizarCliente, deletarCliente } from './services/api';
-import KqlSimulator from './KqlSimulator';
-
 // ── Componentes da vitrine ────────────────────────────────────────────────────
 
 function StatusDot({ ok }) {
@@ -255,12 +253,6 @@ function App() {
             <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
           ))}
         </div>
-      </section>
-
-      {/* ── KQL ─────────────────────────────────────────────────────── */}
-      <section className="showcase-section">
-        <h2 className="section-heading"><span>//</span> monitoramento · kql</h2>
-        <KqlSimulator />
       </section>
 
       {/* ── DIVISOR ─────────────────────────────────────────────────── */}
