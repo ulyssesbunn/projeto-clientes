@@ -7,6 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                cleanWs()
                 echo 'Pegando codigo do repositorio...'
                 checkout scm
             }
