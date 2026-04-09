@@ -193,20 +193,23 @@ function App() {
         <p className="hero-desc">
           Projeto full stack containerizado com pipeline DevSecOps completo — SAST via SonarQube,
           análise de dependências com OWASP Dependency Check, varredura de imagens com Trivy e DAST
-          com OWASP ZAP, entregue em produção com CI/CD automatizado via Jenkins em infraestrutura
-          multi-cloud (AWS EC2 + Azure VM).
+          com OWASP ZAP, entregue em produção com CI/CD automatizado via Jenkins + GitHub em
+          infraestrutura multi-cloud (AWS EC2 + Azure VM).
         </p>
         <div className="tech-tags">
           <TechTag name="React 18"    color="#61dafb" />
           <TechTag name="FastAPI"     color="#009688" />
+          <TechTag name="Python"      color="#3776ab" />
           <TechTag name="PostgreSQL"  color="#336791" />
           <TechTag name="Docker"      color="#2496ed" />
           <TechTag name="Jenkins"     color="#d33833" />
+          <TechTag name="GitHub"      color="#24292e" />
           <TechTag name="AWS EC2"     color="#ff9900" />
           <TechTag name="Azure VM"    color="#0078d4" />
           <TechTag name="Nginx"       color="#43a047" />
           <TechTag name="Prometheus"  color="#e6522c" />
           <TechTag name="Grafana"     color="#f46800" />
+          <TechTag name="pgAdmin"     color="#336791" />
           <TechTag name="SonarQube"   color="#4e9bcd" />
           <TechTag name="OWASP ZAP"   color="#00549e" />
           <TechTag name="Trivy"       color="#1904da" />
@@ -218,13 +221,15 @@ function App() {
       <section className="showcase-section">
         <h2 className="section-heading"><span>//</span> infraestrutura</h2>
         <div className="infra-grid">
-          <InfraCard icon="☁️"  title="AWS EC2"        sub="t3.micro · us-east-1"       ok={backendOk === true} />
-          <InfraCard icon="🐳"  title="Docker"         sub="containers em produção"      ok />
-          <InfraCard icon="⚡"  title="Nginx"          sub="proxy reverso interno"       ok />
-          <InfraCard icon="🐍"  title="FastAPI"        sub="backend · porta 8000"        ok={backendOk === true} />
+          <InfraCard icon="☁️"  title="AWS EC2"        sub="t3.micro · us-east-1"            ok={backendOk === true} />
+          <InfraCard icon="☁️"  title="Azure VM"       sub="máquina virtual · Microsoft"     ok />
+          <InfraCard icon="🐳"  title="Docker"         sub="containers em produção"           ok />
+          <InfraCard icon="⚡"  title="Nginx"          sub="proxy reverso interno"            ok />
+          <InfraCard icon="🐍"  title="FastAPI"        sub="backend · porta 8000"             ok={backendOk === true} />
           <InfraCard icon="🐘"  title="PostgreSQL 15"  sub={`${clientes.length} clientes no banco`} ok />
-          <InfraCard icon="🔁"  title="Jenkins CI/CD"  sub="build → SCP → SSH deploy"   ok />
-          <InfraCard icon="☁️"  title="Azure VM"        sub="máquina virtual · Microsoft"  ok />
+          <InfraCard icon="🗄️"  title="pgAdmin"        sub="gerenciamento do banco"           ok />
+          <InfraCard icon="🔁"  title="Jenkins CI/CD"  sub="build → test → deploy"           ok />
+          <InfraCard icon="🐙"  title="GitHub"         sub="controle de versão · source"     ok />
         </div>
       </section>
 
@@ -350,7 +355,7 @@ function App() {
       </div>
 
       <footer className="footer">
-        <p>projeto-clientes · AWS EC2 · Azure VM · Docker + FastAPI + React + Jenkins</p>
+        <p>projeto-clientes · AWS EC2 · Azure VM · Docker + FastAPI + React + Jenkins + GitHub</p>
       </footer>
 
     </div>
