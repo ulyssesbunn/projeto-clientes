@@ -203,7 +203,7 @@ function App() {
           <TechTag name="PostgreSQL"  color="#336791" />
           <TechTag name="Docker"      color="#2496ed" />
           <TechTag name="Jenkins"     color="#d33833" />
-          <TechTag name="GitHub"      color="#24292e" />
+          <TechTag name="GitHub"      color="#a371f7" />
           <TechTag name="AWS EC2"     color="#ff9900" />
           <TechTag name="Azure VM"    color="#0078d4" />
           <TechTag name="Nginx"       color="#43a047" />
@@ -228,8 +228,8 @@ function App() {
           <InfraCard icon="🐍"  title="FastAPI"        sub="backend · porta 8000"             ok={backendOk === true} />
           <InfraCard icon="🐘"  title="PostgreSQL 15"  sub={`${clientes.length} clientes no banco`} ok />
           <InfraCard icon="🗄️"  title="pgAdmin"        sub="gerenciamento do banco"           ok />
-          <InfraCard icon="🔁"  title="Jenkins CI/CD"  sub="build → test → deploy"           ok />
-          <InfraCard icon="🐙"  title="GitHub"         sub="controle de versão · source"     ok />
+          <InfraCard icon="🤵"  title="Jenkins CI/CD"  sub="build → test → deploy"           ok />
+          <InfraCard icon="🐱"  title="GitHub"         sub="controle de versão · source"     ok />
         </div>
       </section>
 
