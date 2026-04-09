@@ -7,9 +7,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                cleanWs()
-                echo 'Pegando codigo do repositorio...'
                 checkout scm
+                sh 'git clean -fdx'
+                echo 'Pegando codigo do repositorio...'
             }
         }
         stage('SonarQube: Code Analysis') {
