@@ -214,6 +214,7 @@ function App() {
           <TechTag name="OWASP ZAP"   color="#00549e" />
           <TechTag name="Trivy"       color="#1904da" />
           <TechTag name="Dep Check"   color="#6db33f" />
+          <TechTag name="Terraform"   color="#7b42bc" />
         </div>
       </section>
 
@@ -230,6 +231,7 @@ function App() {
           <InfraCard icon="🗄️"  title="pgAdmin"        sub="gerenciamento do banco"           ok />
           <InfraCard icon="🤵"  title="Jenkins CI/CD"  sub="build → test → deploy"           ok />
           <InfraCard icon="🐱"  title="GitHub"         sub="controle de versão · source"     ok />
+          <InfraCard icon="🏗️"  title="Terraform"      sub="IaC · provisiona EC2"            ok />
         </div>
       </section>
 
@@ -259,14 +261,25 @@ function App() {
           <div className="arch-note">
             Notebook DEV → Jenkins → SCP + SSH → EC2 · Elastic IP fixo
           </div>
+          <div className="arch-note arch-note--infra">
+            Terraform (Jenkinsfile.infra) → Jenkins → terraform apply → EC2 provisionada
+          </div>
         </div>
       </section>
 
-      {/* ── PIPELINE ────────────────────────────────────────────────── */}
+      {/* ── PIPELINE DEV ────────────────────────────────────────────── */}
       <section className="showcase-section">
         <h2 className="section-heading"><span>//</span> pipeline ci/cd</h2>
+        <div className="pipeline-label">DEV · Jenkinsfile</div>
         <div className="pipeline">
           {['Checkout', 'SonarQube Analysis', 'Quality Gate', 'OWASP Dep Check', 'Build Backend', 'Build Frontend', 'Trivy Scan', 'Deploy DEV', 'OWASP ZAP DAST'].map((label, i) => (
+            <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
+          ))}
+        </div>
+
+        <div className="pipeline-label pipeline-label--infra">PROD · Jenkinsfile.infra</div>
+        <div className="pipeline">
+          {['Checkout SCM', 'Checkout', 'Terraform Init', 'Terraform Plan', 'Terraform Apply — Criar EC2', 'Terraform Destroy — Destruir EC2', 'Post Actions'].map((label, i) => (
             <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
           ))}
         </div>
