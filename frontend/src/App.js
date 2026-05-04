@@ -190,14 +190,24 @@ function App() {
         <h1 className="hero-title">
           Sistema de Cadastro <span className="hero-accent">de Clientes</span>
         </h1>
-        <p className="hero-desc">
-          Projeto full stack containerizado com pipeline DevSecOps completo — SAST via SonarQube,
-          análise de dependências com OWASP Dependency Check, varredura de imagens com Trivy e DAST
-          com OWASP ZAP, entregue em produção via CI/CD automatizado com Jenkins e GitHub.
-          A infraestrutura de produção na AWS EC2 é provisionada sob demanda via Terraform e destruída
-          após cada deploy, com Elastic IP preservado para garantir endereço fixo em futuros ciclos —
-          eliminando custo de instância ociosa sem abrir mão da rastreabilidade.
-        </p>
+        <div className="hero-desc-row">
+          <p className="hero-desc">
+            Projeto full stack containerizado com pipeline DevSecOps completo — SAST via SonarQube,
+            análise de dependências com OWASP Dependency Check, varredura de imagens com Trivy e DAST
+            com OWASP ZAP, entregue em produção via CI/CD automatizado com Jenkins e GitHub.
+            A infraestrutura de produção na AWS EC2 é provisionada sob demanda via Terraform e destruída
+            após cada deploy, com Elastic IP preservado para garantir endereço fixo em futuros ciclos —
+            eliminando custo de instância ociosa sem abrir mão da rastreabilidade.
+          </p>
+          <p className="hero-desc hero-desc--en">
+            Full stack containerized project with a complete DevSecOps pipeline — SAST via SonarQube,
+            dependency analysis with OWASP Dependency Check, image scanning with Trivy and DAST
+            with OWASP ZAP, delivered to production via automated CI/CD with Jenkins and GitHub.
+            The AWS EC2 production infrastructure is provisioned on demand via Terraform and destroyed
+            after each deploy, with the Elastic IP preserved to guarantee a fixed address across future
+            cycles — eliminating idle instance costs without sacrificing traceability.
+          </p>
+        </div>
         <div className="tech-tags">
           <TechTag name="React 18"    color="#61dafb" />
           <TechTag name="FastAPI"     color="#009688" />
