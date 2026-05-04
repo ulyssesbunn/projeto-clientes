@@ -198,6 +198,10 @@ function App() {
             A infraestrutura de produção na AWS EC2 é provisionada sob demanda via Terraform e destruída
             após cada deploy, com Elastic IP preservado para garantir endereço fixo em futuros ciclos —
             eliminando custo de instância ociosa sem abrir mão da rastreabilidade.
+            O ambiente conta ainda com stack de observabilidade completa — Prometheus coletando métricas
+            de todos os containers, Grafana provendo dashboards em tempo real e cAdvisor expondo consumo
+            de CPU, memória e rede por container — garantindo visibilidade operacional contínua sobre o
+            ambiente de desenvolvimento.
           </p>
           <p className="hero-desc hero-desc--en">
             Full stack containerized project with a complete DevSecOps pipeline — SAST via SonarQube,
@@ -206,6 +210,10 @@ function App() {
             The AWS EC2 production infrastructure is provisioned on demand via Terraform and destroyed
             after each deploy, with the Elastic IP preserved to guarantee a fixed address across future
             cycles — eliminating idle instance costs without sacrificing traceability.
+            The environment also includes a full observability stack — Prometheus collecting metrics
+            from all containers, Grafana providing real-time dashboards and cAdvisor exposing CPU,
+            memory and network consumption per container — ensuring continuous operational visibility
+            over the development environment.
           </p>
         </div>
         <div className="tech-tags">
