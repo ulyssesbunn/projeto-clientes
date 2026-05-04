@@ -44,7 +44,7 @@ pipeline {
                             backend/ frontend/ database/ docker-compose.prod.yml \
                             ${EC2_USER}@${EC2_HOST}:${EC2_DIR}/
                         ssh -i \$SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} \
-                            'cd ${EC2_DIR} && BUILD_NUMBER=${BUILD_NUMBER} docker compose -f docker-compose.prod.yml up -d --build && docker tag projeto-clientes-backend:latest projeto-clientes-backend:${BUILD_NUMBER} && docker tag projeto-clientes-frontend:latest projeto-clientes-frontend:${BUILD_NUMBER} && docker image prune -f'
+                            'cd ${EC2_DIR} && BUILD_NUMBER=${BUILD_NUMBER} docker-compose -f docker-compose.prod.yml up -d --build && docker tag projeto-clientes-backend:latest projeto-clientes-backend:${BUILD_NUMBER} && docker tag projeto-clientes-frontend:latest projeto-clientes-frontend:${BUILD_NUMBER} && docker image prune -f'
                     """
                 }
             }
