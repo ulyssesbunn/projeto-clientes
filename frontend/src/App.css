@@ -271,6 +271,7 @@ body {
 }
 .pipeline-label:first-of-type { margin-top: 0; }
 .pipeline-label--infra { color: #ff9900; }
+.pipeline-label--prod  { color: #43a047; }
 
 .pipeline {
   display: flex;

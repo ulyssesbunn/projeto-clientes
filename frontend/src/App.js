@@ -193,8 +193,10 @@ function App() {
         <p className="hero-desc">
           Projeto full stack containerizado com pipeline DevSecOps completo — SAST via SonarQube,
           análise de dependências com OWASP Dependency Check, varredura de imagens com Trivy e DAST
-          com OWASP ZAP, entregue em produção com CI/CD automatizado via Jenkins + GitHub em
-          infraestrutura multi-cloud (AWS EC2 + Azure VM).
+          com OWASP ZAP, entregue em produção via CI/CD automatizado com Jenkins e GitHub.
+          A infraestrutura de produção na AWS EC2 é provisionada sob demanda via Terraform e destruída
+          após cada deploy, com Elastic IP preservado para garantir endereço fixo em futuros ciclos —
+          eliminando custo de instância ociosa sem abrir mão da rastreabilidade.
         </p>
         <div className="tech-tags">
           <TechTag name="React 18"    color="#61dafb" />
@@ -277,9 +279,16 @@ function App() {
           ))}
         </div>
 
-        <div className="pipeline-label pipeline-label--infra">PROD · Jenkinsfile.infra</div>
+        <div className="pipeline-label pipeline-label--infra">PROD · Jenkinsfile.infra — Criar EC2</div>
         <div className="pipeline">
           {['Checkout SCM', 'Checkout', 'Terraform Init', 'Terraform Plan', 'Terraform Apply — Criar EC2', 'Terraform Destroy — Destruir EC2', 'Post Actions'].map((label, i) => (
+            <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
+          ))}
+        </div>
+
+        <div className="pipeline-label pipeline-label--prod">PROD · Jenkinsfile.prod — Deploy App EC2</div>
+        <div className="pipeline">
+          {['Checkout', 'Build Backend', 'Build Frontend', 'Test', 'Deploy PROD (EC2)', 'Post Actions'].map((label, i) => (
             <PipeStep key={i} num={String(i + 1).padStart(2, '0')} label={label} done />
           ))}
         </div>
