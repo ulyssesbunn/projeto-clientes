@@ -1,0 +1,101 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ACTION',
+            choices: ['apply', 'destroy'],
+            description: 'apply = cria EC2 | destroy = destroi EC2 (EIP permanece)'
+        )
+    }
+
+    environment {
+        TF_DIR          = '/home/ubunn/projeto-clientes/terraform'
+        TF_STATE_DIR    = '/home/ubunn/terraform-state'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Pegando codigo do repositorio...'
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh """
+                        mkdir -p ${TF_STATE_DIR}
+                        cd ${TF_DIR}
+                        terraform init -reconfigure \
+                            -backend-config="path=${TF_STATE_DIR}/terraform.tfstate"
+                    """
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            when {
+                expression { return params.ACTION == 'apply' }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh "cd ${TF_DIR} && terraform plan"
+                }
+            }
+        }
+
+        stage('Terraform Apply — Criar EC2') {
+            when {
+                expression { return params.ACTION == 'apply' }
+            }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh "cd ${TF_DIR} && terraform apply -auto-approve"
+                }
+            }
+        }
+
+        stage('Terraform Destroy — Destruir EC2') {
+            when {
+                expression { return params.ACTION == 'destroy' }
+            }
+            steps {
+                input message: 'Confirmar destruicao da EC2? O EIP permanece.', ok: 'Destruir EC2'
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh """
+                        cd ${TF_DIR}
+                        terraform destroy \
+                            -target=aws_instance.prod \
+                            -target=aws_eip_association.prod \
+                            -auto-approve
+                    """
+                }
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "Infraestrutura: ${params.ACTION} concluido com sucesso."
+        }
+        failure {
+            echo "Falha na operacao de infraestrutura: ${params.ACTION}"
+        }
+    }
+}
