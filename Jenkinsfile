@@ -5,6 +5,13 @@ pipeline {
         SONAR_HOME = tool 'Sonar'
     }
     stages {
+        stage('KQL Port-Forward') {
+            steps {
+                sh 'pkill -f "port-forward svc/kql-simulator" || true'
+                sh 'kubectl port-forward svc/kql-simulator 8091:80 -n kql-dev &'
+                sh 'sleep 3'
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
