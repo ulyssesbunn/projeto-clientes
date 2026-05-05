@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { listarClientes, criarCliente, atualizarCliente, deletarCliente } from './services/api';
-import KqlSimulator from './KqlSimulator';
+import { openKqlSimulator } from './KqlSimulator';
 // ── Componentes da vitrine ────────────────────────────────────────────────────
 
 function StatusDot({ ok }) {
@@ -48,7 +48,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [backendOk, setBackendOk] = useState(null);
-  const [kqlOpen, setKqlOpen] = useState(false);
+  const k8sEnabled = true;
 
   // Formulário
   const [nome, setNome] = useState('');
@@ -166,7 +166,6 @@ function App() {
 
   return (
     <div className="App">
-      {kqlOpen && <KqlSimulator onClose={() => setKqlOpen(false)} />}
 
       {/* ── HEADER ──────────────────────────────────────────────────── */}
       <header className="site-header">
@@ -177,7 +176,19 @@ function App() {
             <span className="brand-bracket">]</span>
           </div>
           <div className="header-status">
-            <button className="btn-kql" onClick={() => setKqlOpen(true)}>Kusto Query</button>
+            {k8sEnabled ? (
+              <button className="btn-kql" onClick={openKqlSimulator}>
+                KQL Simulator
+              </button>
+            ) : (
+              <button
+                className="btn-kql btn-kql--disabled"
+                disabled
+                title="Available in DEV environment only"
+              >
+                KQL Simulator
+              </button>
+            )}
             <StatusDot ok={backendOk === true} />
             <span>{backendOk === true ? 'PROD · ONLINE' : backendOk === false ? 'OFFLINE' : 'verificando...'}</span>
           </div>

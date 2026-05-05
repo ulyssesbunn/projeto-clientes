@@ -36,6 +36,10 @@ services:
       - projeto-network
 
   frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_K8S_ENABLED: "true"
     image: projeto-clientes-frontend:${BUILD_NUMBER}
     container_name: projeto-clientes-frontend
     restart: unless-stopped
@@ -48,6 +52,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+      - REACT_APP_K8S_ENABLED=true
 
   pgadmin:
     image: dpage/pgadmin4:latest

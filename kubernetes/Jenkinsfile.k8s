@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh 'docker build -t kql-simulator:latest ./kubernetes/kql-service/'
+            }
+        }
+
+        stage('Load Image into kind') {
+            steps {
+                sh 'kind load docker-image kql-simulator:latest --name desktop'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'kubectl apply -f kubernetes/manifests/namespace.yaml'
+                sh 'kubectl apply -f kubernetes/manifests/deployment.yaml'
+                sh 'kubectl apply -f kubernetes/manifests/service.yaml'
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh 'kubectl rollout status deployment/kql-simulator -n kql-dev --timeout=60s'
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh 'curl http://localhost:30080/health'
+            }
+        }
+    }
+}

@@ -46,6 +46,8 @@ services:
       - backend
     networks:
       - projeto-network
+    environment:
+      - REACT_APP_K8S_ENABLED=false
 
 volumes:
   postgres_data:

@@ -626,6 +626,13 @@ body {
   background: var(--accent);
   color: #fff;
 }
+.btn-kql--disabled,
+.btn-kql--disabled:hover {
+  border-color: #555;
+  color: #555;
+  background: transparent;
+  cursor: not-allowed;
+}
 
 /* ── RESPONSIVO ────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {

@@ -62,7 +62,7 @@ pipeline {
             steps {
                 echo 'Building Frontend (dev)...'
                 dir('frontend') {
-                    sh 'docker build -t projeto-clientes-frontend:${BUILD_NUMBER} .'
+                    sh 'docker build --build-arg REACT_APP_K8S_ENABLED=true -t projeto-clientes-frontend:${BUILD_NUMBER} .'
                 }
             }
         }

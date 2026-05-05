@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KQL Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base:     #1a1a2e;
+      --bg-surface:  #16213e;
+      --bg-elevated: #0f3460;
+      --bg-input:    #0d1b2a;
+      --border:      #2a3a5c;
+      --border-focus:#4e7fff;
+      --text-primary:#e2e8f0;
+      --text-muted:  #8899aa;
+      --text-dim:    #5a6a7a;
+      --accent:      #4e7fff;
+      --accent-hover:#6b94ff;
+      --success:     #22c55e;
+      --error:       #f87171;
+      --error-bg:    #2d1515;
+      --code-bg:     #0a1520;
+      --row-alt:     #111d30;
+      --row-hover:   #1a2d4a;
+      --spinner:     #4e7fff;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .header-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #4e7fff 0%, #6b38fb 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+    }
+
+    .header-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'Consolas', 'Cascadia Code', monospace;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 24px 24px;
+      gap: 12px;
+      max-width: 1400px;
+      width: 100%;
+      align-self: center;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+
+    select {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+      min-width: 260px;
+      transition: border-color 0.15s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238899aa' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+    select:hover { border-color: var(--accent); }
+    select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px rgba(78,127,255,0.15); }
+    select option { background: var(--bg-input); }
+
+    /* ── Editor panel ── */
+    .editor-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .editor-bar {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .editor-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-lang-tag {
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--accent);
+      background: rgba(78,127,255,0.12);
+      border: 1px solid rgba(78,127,255,0.25);
+      border-radius: 3px;
+      padding: 1px 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .editor-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: none;
+      outline: none;
+      resize: vertical;
+      padding: 14px 16px;
+      font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
+      font-size: 13.5px;
+      line-height: 1.6;
+      tab-size: 4;
+      display: block;
+    }
+    textarea::placeholder { color: var(--text-dim); }
+    textarea:focus { background: #0c1929; }
+
+    /* ── Run button ── */
+    .run-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      letter-spacing: 0.2px;
+      transition: background 0.15s, transform 0.08s;
+      white-space: nowrap;
+    }
+    .run-btn:hover:not(:disabled) { background: var(--accent-hover); }
+    .run-btn:active:not(:disabled) { transform: scale(0.97); }
+    .run-btn:disabled { background: #2a3a6a; color: #4a5a7a; cursor: not-allowed; }
+
+    .run-btn svg { flex-shrink: 0; }
+
+    /* ── Spinner ── */
+    .spinner-wrap {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .spinner-wrap.visible { display: flex; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--spinner);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    /* ── Results panel ── */
+    #results { display: none; flex-direction: column; gap: 12px; }
+    #results.visible { display: flex; }
+
+    .result-meta {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .meta-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 12px;
+      letter-spacing: 0.3px;
+    }
+    .badge-count {
+      background: rgba(34,197,94,0.12);
+      color: var(--success);
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+    .badge-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .sql-block-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sql-block-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    pre.sql-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 12px;
+      color: #a8d8ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+      overflow-x: auto;
+    }
+
+    /* ── Error ── */
+    .error-box {
+      background: var(--error-bg);
+      border: 1px solid rgba(248,113,113,0.35);
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .error-icon {
+      color: var(--error);
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .error-text {
+      font-size: 13px;
+      color: var(--error);
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .table-header-bar {
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    th {
+      background: #0e2040;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 9px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    th:not(:last-child) { border-right: 1px solid var(--border); }
+
+    td {
+      padding: 7px 14px;
+      border-bottom: 1px solid rgba(42,58,92,0.5);
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      color: var(--text-primary);
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    td:not(:last-child) { border-right: 1px solid rgba(42,58,92,0.3); }
+
+    tr:nth-child(even) td { background: var(--row-alt); }
+    tr:hover td { background: var(--row-hover); }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      gap: 10px;
+      color: var(--text-dim);
+    }
+    .empty-icon { font-size: 36px; opacity: 0.4; }
+    .empty-text { font-size: 13px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a3a5c; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a4f7a; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="3" width="14" height="2" rx="1" fill="white" opacity="0.9"/>
+      <rect x="1" y="7" width="9" height="2" rx="1" fill="white" opacity="0.7"/>
+      <rect x="1" y="11" width="12" height="2" rx="1" fill="white" opacity="0.5"/>
+    </svg>
+  </div>
+  <span class="header-title">KQL Simulator</span>
+  <div class="header-sep"></div>
+  <span class="header-subtitle">SecurityEvent &mdash; 500 events</span>
+</header>
+
+<main>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <span class="toolbar-label">Examples</span>
+    <select id="examples-select">
+      <option value="">— load an example query —</option>
+    </select>
+  </div>
+
+  <!-- Editor -->
+  <div class="editor-panel">
+    <div class="editor-bar">
+      <div class="editor-bar-left">
+        <span class="editor-lang-tag">KQL</span>
+        <span class="editor-hint">Ctrl+Enter to run</span>
+      </div>
+      <button class="run-btn" id="run-btn" title="Run query (Ctrl+Enter)">
+        <svg width="12" height="13" viewBox="0 0 12 13" fill="none">
+          <path d="M2 1.5L11 6.5L2 11.5V1.5Z" fill="currentColor"/>
+        </svg>
+        Run
+      </button>
+    </div>
+    <textarea
+      id="query-input"
+      spellcheck="false"
+      placeholder="SecurityEvent&#10;| where EventID == 4625&#10;| summarize count() by Account&#10;| sort by count_ desc&#10;| take 20"
+    ></textarea>
+  </div>
+
+  <!-- Spinner -->
+  <div class="spinner-wrap" id="spinner">
+    <div class="spinner"></div>
+    <span>Running query&hellip;</span>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <!-- Meta (row count + SQL) -->
+    <div class="result-meta" id="result-meta"></div>
+    <!-- Error -->
+    <div class="error-box" id="error-box" style="display:none">
+      <span class="error-icon">&#9888;</span>
+      <span class="error-text" id="error-text"></span>
+    </div>
+    <!-- Table -->
+    <div class="table-wrap" id="table-wrap" style="display:none">
+      <div class="table-header-bar" id="table-bar"></div>
+      <div class="table-scroll">
+        <table id="result-table">
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  const qs = id => document.getElementById(id);
+
+  const examplesSelect = qs('examples-select');
+  const queryInput     = qs('query-input');
+  const runBtn         = qs('run-btn');
+  const spinner        = qs('spinner');
+  const results        = qs('results');
+  const resultMeta     = qs('result-meta');
+  const errorBox       = qs('error-box');
+  const errorText      = qs('error-text');
+  const tableWrap      = qs('table-wrap');
+  const tableBar       = qs('table-bar');
+  const tableHead      = qs('table-head');
+  const tableBody      = qs('table-body');
+
+  let running = false;
+
+  /* ── Load examples ── */
+  async function loadExamples() {
+    try {
+      const res = await fetch('/examples');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+      data.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex.query || '';
+        opt.textContent = ex.name || ex.query || '(unnamed)';
+        examplesSelect.appendChild(opt);
+      });
+    } catch (_) {
+      // server not reachable yet — silently skip
+    }
+  }
+
+  examplesSelect.addEventListener('change', () => {
+    const val = examplesSelect.value;
+    if (val) {
+      queryInput.value = val;
+      queryInput.focus();
+    }
+  });
+
+  /* ── Run query ── */
+  async function runQuery() {
+    const query = queryInput.value.trim();
+    if (!query || running) return;
+
+    running = true;
+    runBtn.disabled = true;
+    spinner.classList.add('visible');
+    results.classList.remove('visible');
+    errorBox.style.display = 'none';
+    tableWrap.style.display = 'none';
+
+    try {
+      const res = await fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+
+      const data = await res.json();
+      renderResults(data);
+    } catch (err) {
+      renderError('Network error: ' + err.message);
+    } finally {
+      running = false;
+      runBtn.disabled = false;
+      spinner.classList.remove('visible');
+    }
+  }
+
+  /* ── Render results ── */
+  function renderResults(data) {
+    results.classList.add('visible');
+
+    // Meta section
+    resultMeta.innerHTML = '';
+
+    if (data.error) {
+      renderError(data.error);
+
+      // Still show meta if available
+      if (data.sql) {
+        resultMeta.appendChild(buildSqlBlock(data.sql));
+      }
+      return;
+    }
+
+    const rows   = Array.isArray(data.rows)    ? data.rows    : [];
+    const cols   = Array.isArray(data.columns) ? data.columns : [];
+    const count  = data.row_count !== undefined ? data.row_count : rows.length;
+
+    // Count badge
+    const metaRow = document.createElement('div');
+    metaRow.className = 'meta-row';
+
+    const badge = document.createElement('span');
+    badge.className = 'meta-badge badge-count';
+    badge.textContent = count.toLocaleString() + ' row' + (count !== 1 ? 's' : '');
+
+    const lbl = document.createElement('span');
+    lbl.className = 'badge-label';
+    lbl.textContent = 'returned';
+
+    metaRow.appendChild(badge);
+    metaRow.appendChild(lbl);
+    resultMeta.appendChild(metaRow);
+
+    // SQL block
+    if (data.sql) {
+      resultMeta.appendChild(buildSqlBlock(data.sql));
+    }
+
+    // Table
+    if (cols.length > 0) {
+      tableBar.textContent = cols.length + ' column' + (cols.length !== 1 ? 's' : '');
+      tableBar.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="opacity:.6">
+          <rect x="0" y="0" width="12" height="3" rx="1" fill="currentColor"/>
+          <rect x="0" y="4.5" width="12" height="3" rx="1" fill="currentColor"/>
+          <rect x="0" y="9" width="12" height="3" rx="1" fill="currentColor"/>
+        </svg>
+        &nbsp;${cols.length} column${cols.length !== 1 ? 's' : ''}&nbsp;&middot;&nbsp;${count.toLocaleString()} row${count !== 1 ? 's' : ''}
+      `;
+
+      // Head
+      tableHead.innerHTML = '';
+      const tr = document.createElement('tr');
+      cols.forEach(c => {
+        const th = document.createElement('th');
+        th.textContent = c;
+        tr.appendChild(th);
+      });
+      tableHead.appendChild(tr);
+
+      // Body
+      tableBody.innerHTML = '';
+      if (rows.length === 0) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = cols.length;
+        emptyCell.style.textAlign = 'center';
+        emptyCell.style.color = 'var(--text-dim)';
+        emptyCell.style.padding = '24px';
+        emptyCell.textContent = 'No rows returned.';
+        emptyRow.appendChild(emptyCell);
+        tableBody.appendChild(emptyRow);
+      } else {
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+          const cells = Array.isArray(row) ? row : cols.map(c => row[c]);
+          cells.forEach(val => {
+            const td = document.createElement('td');
+            td.title = val !== null && val !== undefined ? String(val) : '';
+            td.textContent = val !== null && val !== undefined ? String(val) : '';
+            tr.appendChild(td);
+          });
+          tableBody.appendChild(tr);
+        });
+      }
+
+      tableWrap.style.display = 'block';
+    } else if (rows.length === 0 && !data.sql) {
+      // No data at all — show empty state inside meta
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<span class="empty-icon">&#9634;</span><span class="empty-text">Query returned no results.</span>';
+      resultMeta.appendChild(empty);
+    }
+  }
+
+  function buildSqlBlock(sql) {
+    const wrap = document.createElement('div');
+    wrap.className = 'sql-block-wrap';
+    const lbl = document.createElement('div');
+    lbl.className = 'sql-block-label';
+    lbl.textContent = 'SQL Translation';
+    const pre = document.createElement('pre');
+    pre.className = 'sql-block';
+    pre.textContent = sql;
+    wrap.appendChild(lbl);
+    wrap.appendChild(pre);
+    return wrap;
+  }
+
+  function renderError(msg) {
+    results.classList.add('visible');
+    errorText.textContent = msg;
+    errorBox.style.display = 'flex';
+  }
+
+  /* ── Events ── */
+  runBtn.addEventListener('click', runQuery);
+
+  queryInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      runQuery();
+    }
+    // Tab → insert spaces instead of losing focus
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = queryInput.selectionStart;
+      const v = queryInput.value;
+      queryInput.value = v.substring(0, s) + '    ' + v.substring(queryInput.selectionEnd);
+      queryInput.selectionStart = queryInput.selectionEnd = s + 4;
+    }
+  });
+
+  /* ── Init ── */
+  loadExamples();
+})();
+</script>
+</body>
+</html>
