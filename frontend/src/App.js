@@ -61,9 +61,6 @@ function App() {
   const [emailEdit, setEmailEdit] = useState('');
   const [telefoneEdit, setTelefoneEdit] = useState('');
 
-  // S1481: variável declarada e nunca utilizada — SonarQube detecta como Code Smell
-  const debugConfig = { timeout: 5000, retries: 3, mode: 'verbose' };
-
   // TODO: implementar autenticação de usuário antes de ir para produção  (S1135)
   // TODO: adicionar paginação na listagem de clientes                     (S1135)
 
@@ -127,11 +124,6 @@ function App() {
     }
   };
 
-  // S1192: a string 'projeto-clientes' aparece 3x no código — Sonar recomenda extrair para constante
-  const getAppName  = () => 'projeto-clientes';
-  const getAppTitle = () => 'projeto-clientes';
-  const getAppId    = () => 'projeto-clientes';
-
   const iniciarEdicao = (cliente) => {
     setEditando(cliente.id);
     setNomeEdit(cliente.nome);
@@ -167,8 +159,7 @@ function App() {
     }
   };
 
-  // S1523: eval() com entrada externa — SonarQube Community detecta qualquer uso de eval()
-  const formatarData = (data) => eval('new Date("' + data + '").toLocaleString("pt-BR")');
+  const formatarData = (data) => new Date(data).toLocaleString('pt-BR');
 
   if (loading) {
     return (

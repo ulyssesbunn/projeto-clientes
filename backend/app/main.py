@@ -12,6 +12,8 @@ from .database import get_db, engine
 from .models import Cliente, Base
 from .schemas import ClienteCreate, ClienteUpdate, ClienteResponse
 
+CLIENT_NOT_FOUND = "Cliente não encontrado"
+
 # Criar tabelas no banco (caso não existam)
 Base.metadata.create_all(bind=engine)
 
@@ -88,7 +90,7 @@ def buscar_cliente(cliente_id: int, db: Session = Depends(get_db)):
     """
     cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
     if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        raise HTTPException(status_code=404, detail=CLIENT_NOT_FOUND)
     return cliente
 
 @app.put("/clientes/{cliente_id}", response_model=ClienteResponse)
@@ -103,7 +105,7 @@ def atualizar_cliente(
     # Buscar cliente
     cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
     if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        raise HTTPException(status_code=404, detail=CLIENT_NOT_FOUND)
     
     # Atualizar apenas campos fornecidos
     update_data = cliente_update.model_dump(exclude_unset=True)
@@ -133,7 +135,7 @@ def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
     """
     cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
     if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        raise HTTPException(status_code=404, detail=CLIENT_NOT_FOUND)
     
     db.delete(cliente)
     db.commit()
@@ -175,5 +177,5 @@ def buscar_cliente_por_email(email: str, db: Session = Depends(get_db)):
     """
     cliente = db.query(Cliente).filter(Cliente.email == email).first()
     if not cliente:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        raise HTTPException(status_code=404, detail=CLIENT_NOT_FOUND)
     return cliente
