@@ -1,6 +1,8 @@
 """
 API FastAPI - Sistema de Cadastro de Clientes
 """
+import subprocess
+import time
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -137,6 +139,32 @@ def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"message": f"Cliente {cliente_id} deletado com sucesso"}
+
+# ==================== KQL ENDPOINTS ====================
+
+@app.post("/kql/start")
+def kql_start():
+    try:
+        result = subprocess.run(
+            ['pgrep', '-f', 'port-forward svc/kql-simulator'],
+            capture_output=True
+        )
+        if result.returncode != 0:
+            subprocess.Popen(
+                ['kubectl', 'port-forward', 'svc/kql-simulator', '8091:80', '-n', 'kql-dev']
+            )
+            time.sleep(2)
+        return {"status": "ok", "url": "http://localhost:8091"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/kql/status")
+def kql_status():
+    result = subprocess.run(
+        ['pgrep', '-f', 'port-forward svc/kql-simulator'],
+        capture_output=True
+    )
+    return {"running": result.returncode == 0}
 
 # ==================== ENDPOINTS EXTRAS ====================
 

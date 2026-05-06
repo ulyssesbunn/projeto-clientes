@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { listarClientes, criarCliente, atualizarCliente, deletarCliente } from './services/api';
-import { openKqlSimulator } from './KqlSimulator';
 // ── Componentes da vitrine ────────────────────────────────────────────────────
 
 function StatusDot({ ok }) {
@@ -48,6 +47,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [backendOk, setBackendOk] = useState(null);
+  const [kqlLoading, setKqlLoading] = useState(false);
   const k8sEnabled = true;
 
   // Formulário
@@ -71,6 +71,23 @@ function App() {
     carregarClientes();
     checkHealth();
   }, []);
+
+  const handleKqlClick = async () => {
+    setKqlLoading(true);
+    try {
+      const res = await fetch('http://localhost:8000/kql/start', { method: 'POST' });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        window.open(data.url, 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
+      } else {
+        alert('Failed to start KQL Simulator: ' + data.message);
+      }
+    } catch (err) {
+      alert('Failed to start KQL Simulator: ' + err.message);
+    } finally {
+      setKqlLoading(false);
+    }
+  };
 
   const checkHealth = async () => {
     try {
@@ -177,8 +194,8 @@ function App() {
           </div>
           <div className="header-status">
             {k8sEnabled ? (
-              <button className="btn-kql" onClick={openKqlSimulator}>
-                KQL Simulator
+              <button className="btn-kql" onClick={handleKqlClick} disabled={kqlLoading}>
+                {kqlLoading ? 'Starting...' : 'KQL Simulator'}
               </button>
             ) : (
               <button
