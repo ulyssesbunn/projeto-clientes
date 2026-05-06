@@ -26,21 +26,21 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'kubectl apply -f kubernetes/manifests/namespace.yaml'
-                sh 'kubectl apply -f kubernetes/manifests/deployment.yaml'
-                sh 'kubectl apply -f kubernetes/manifests/service.yaml'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "cd ~/projeto-clientes && kubectl apply -f kubernetes/manifests/namespace.yaml"'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "cd ~/projeto-clientes && kubectl apply -f kubernetes/manifests/deployment.yaml"'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "cd ~/projeto-clientes && kubectl apply -f kubernetes/manifests/service.yaml"'
             }
         }
 
         stage('Verify') {
             steps {
-                sh 'kubectl rollout status deployment/kql-simulator -n kql-dev --timeout=60s'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "kubectl rollout status deployment/kql-simulator -n kql-dev --timeout=60s"'
             }
         }
 
         stage('Health Check') {
             steps {
-                sh 'curl http://localhost:30080/health'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "curl -s http://localhost:8091/health"'
             }
         }
     }
