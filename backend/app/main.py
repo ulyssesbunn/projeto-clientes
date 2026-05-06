@@ -1,6 +1,7 @@
 """
 API FastAPI - Sistema de Cadastro de Clientes
 """
+import socket
 import subprocess
 import time
 from fastapi import FastAPI, HTTPException, Depends
@@ -144,14 +145,15 @@ def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
 # ==================== KQL ENDPOINTS ====================
 
+def is_port_open(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(1)
+        return s.connect_ex(('localhost', port)) == 0
+
 @app.post("/kql/start")
 def kql_start():
     try:
-        result = subprocess.run(
-            ['pgrep', '-f', 'port-forward svc/kql-simulator'],
-            capture_output=True
-        )
-        if result.returncode != 0:
+        if not is_port_open(8091):
             subprocess.Popen(
                 ['kubectl', 'port-forward', 'svc/kql-simulator', '8091:80', '-n', 'kql-dev']
             )
@@ -162,11 +164,7 @@ def kql_start():
 
 @app.get("/kql/status")
 def kql_status():
-    result = subprocess.run(
-        ['pgrep', '-f', 'port-forward svc/kql-simulator'],
-        capture_output=True
-    )
-    return {"running": result.returncode == 0}
+    return {"running": is_port_open(8091)}
 
 # ==================== ENDPOINTS EXTRAS ====================
 
