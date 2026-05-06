@@ -14,9 +14,13 @@ pipeline {
             }
         }
 
-        stage('Load Image into kind') {
+        stage('Push to Docker Hub') {
             steps {
-                sh 'kind load docker-image kql-simulator:latest --name desktop'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker tag kql-simulator:latest ulyssesbunn/kql-simulator:latest'
+                    sh 'docker push ulyssesbunn/kql-simulator:latest'
+                }
             }
         }
 
