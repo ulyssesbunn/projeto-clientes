@@ -40,7 +40,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "kubectl get pods -n kql-dev -o jsonpath=\'{.items[0].status.podIP}\' | xargs -I{} curl -s http://{}:8080/health"'
+                sh 'ssh -i /var/jenkins_home/.ssh/id_rsa -o StrictHostKeyChecking=no ubunn@192.168.176.56 "kubectl get pods -n kql-dev"'
             }
         }
     }
