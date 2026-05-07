@@ -145,6 +145,10 @@ def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
 # ==================== KQL ENDPOINTS ====================
 
+HOST = "192.168.176.56"
+SSH_KEY = "/home/ubunn/.ssh/jenkins_rsa"
+SSH_USER = "ubunn"
+
 def is_port_open(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.settimeout(1)
@@ -153,12 +157,18 @@ def is_port_open(port: int) -> bool:
 @app.post("/kql/start")
 def kql_start():
     try:
-        if not is_port_open(8091):
-            subprocess.Popen(
-                ['kubectl', 'port-forward', 'svc/kql-simulator', '8091:80', '-n', 'kql-dev']
-            )
-            time.sleep(2)
-        return {"status": "ok", "url": "http://localhost:8091"}
+        if is_port_open(8091):
+            return {"status": "ok", "url": "http://localhost:8091"}
+        subprocess.Popen([
+            'ssh', '-i', SSH_KEY,
+            '-o', 'StrictHostKeyChecking=no',
+            f'{SSH_USER}@{HOST}',
+            'kubectl port-forward svc/kql-simulator 8091:80 -n kql-dev'
+        ])
+        time.sleep(3)
+        if is_port_open(8091):
+            return {"status": "ok", "url": "http://localhost:8091"}
+        return {"status": "error", "message": "port-forward did not become reachable after 3s"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

@@ -32,6 +32,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - /home/ubunn/.ssh/jenkins_rsa:/home/ubunn/.ssh/jenkins_rsa:ro
     networks:
       - projeto-network
 
