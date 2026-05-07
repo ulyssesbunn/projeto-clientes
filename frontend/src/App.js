@@ -47,7 +47,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [backendOk, setBackendOk] = useState(null);
-  const [kqlLoading, setKqlLoading] = useState(false);
   const k8sEnabled = true;
 
   // Formulário
@@ -69,21 +68,8 @@ function App() {
     checkHealth();
   }, []);
 
-  const handleKqlClick = async () => {
-    setKqlLoading(true);
-    try {
-      const res = await fetch('http://localhost:8000/kql/status');
-      const data = await res.json();
-      if (data.running) {
-        window.open('http://localhost:8091', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
-      } else {
-        alert('KQL Simulator is not running. Please run the kql-simulator job in Jenkins.');
-      }
-    } catch (err) {
-      alert('Failed to check KQL Simulator status: ' + err.message);
-    } finally {
-      setKqlLoading(false);
-    }
+  const handleKqlClick = () => {
+    window.open('http://localhost:8091', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
   };
 
   const checkHealth = async () => {
@@ -185,8 +171,8 @@ function App() {
           </div>
           <div className="header-status">
             {k8sEnabled ? (
-              <button className="btn-kql" onClick={handleKqlClick} disabled={kqlLoading}>
-                {kqlLoading ? 'Starting...' : 'KQL Simulator'}
+              <button className="btn-kql" onClick={handleKqlClick}>
+                KQL Simulator
               </button>
             ) : (
               <button
