@@ -27,6 +27,9 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://admin:admin123@postgres:5432/clientes_db
+      KQL_HOST: "192.168.176.56"
+      KQL_SSH_KEY: /home/ubunn/.ssh/jenkins_rsa
+      KQL_SSH_USER: ubunn
     ports:
       - "8000:8000"
     depends_on:

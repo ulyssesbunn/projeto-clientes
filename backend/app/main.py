@@ -1,6 +1,7 @@
 """
 API FastAPI - Sistema de Cadastro de Clientes
 """
+import os
 import socket
 import subprocess
 import time
@@ -145,9 +146,9 @@ def deletar_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
 # ==================== KQL ENDPOINTS ====================
 
-HOST = "192.168.176.56"
-SSH_KEY = "/home/ubunn/.ssh/jenkins_rsa"
-SSH_USER = "ubunn"
+HOST = os.getenv("KQL_HOST", "192.168.176.56")
+SSH_KEY = os.getenv("KQL_SSH_KEY", "/home/ubunn/.ssh/jenkins_rsa")
+SSH_USER = os.getenv("KQL_SSH_USER", "ubunn")
 
 def is_port_open(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
