@@ -72,15 +72,15 @@ function App() {
   const handleKqlClick = async () => {
     setKqlLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/kql/start', { method: 'POST' });
+      const res = await fetch('http://localhost:8000/kql/status');
       const data = await res.json();
-      if (data.status === 'ok') {
-        window.open(data.url, 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
+      if (data.running) {
+        window.open('http://localhost:8091', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
       } else {
-        alert('Failed to start KQL Simulator: ' + data.message);
+        alert('KQL Simulator is not running. Please run the kql-simulator job in Jenkins.');
       }
     } catch (err) {
-      alert('Failed to start KQL Simulator: ' + err.message);
+      alert('Failed to check KQL Simulator status: ' + err.message);
     } finally {
       setKqlLoading(false);
     }
