@@ -160,16 +160,15 @@ def kql_start():
     try:
         if is_port_open(8091):
             return {"status": "ok", "url": "http://localhost:8091"}
-        subprocess.Popen([
-            'ssh', '-i', SSH_KEY,
-            '-o', 'StrictHostKeyChecking=no',
-            f'{SSH_USER}@{HOST}',
-            'kubectl port-forward svc/kql-simulator 8091:80 -n kql-dev'
-        ])
-        time.sleep(3)
+        subprocess.Popen(
+            f'ssh -i {SSH_KEY} -o StrictHostKeyChecking=no {SSH_USER}@{HOST} '
+            f'\'nohup kubectl port-forward svc/kql-simulator 8091:80 -n kql-dev > /tmp/kql-pf.log 2>&1 &\'',
+            shell=True
+        )
+        time.sleep(5)
         if is_port_open(8091):
             return {"status": "ok", "url": "http://localhost:8091"}
-        return {"status": "error", "message": "port-forward did not become reachable after 3s"}
+        return {"status": "error", "message": "port-forward did not become reachable after 5s"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
