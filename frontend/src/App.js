@@ -68,6 +68,9 @@ function App() {
     checkHealth();
   }, []);
 
+  // KQL Simulator — opens K8s service via port-forward on localhost:8091
+  // DO NOT change this URL back to /kql.html — that is the old static version
+  // The new version runs in Kubernetes and requires port-forward to be active
   const handleKqlClick = () => {
     window.open('http://localhost:8091', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
   };
