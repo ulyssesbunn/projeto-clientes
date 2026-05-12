@@ -69,7 +69,7 @@ function App() {
   }, []);
 
   const handleKqlClick = () => {
-    window.open('http://localhost:3000/kql.html', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
+    window.open('http://localhost:8091', 'KQL Simulator', 'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
   };
 
   const checkHealth = async () => {
